@@ -1,0 +1,277 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+}
+
+.profileLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin-bottom: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.wikiButton {
+  background: none;
+  border: none;
+  padding: 0 var(--spacing-xs);
+  margin-left: var(--spacing-xs);
+  font: inherit;
+  font-size: var(--font-size-md);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.wikiButton:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+.subtitle {
+  font-size: var(--font-size-md);
+  color: var(--color-text-light);
+}
+
+.photoColumn {
+  flex: 0 0 100%;
+}
+
+.infoColumn {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 80vh;
+  padding-right: var(--spacing-md);
+}
+
+.infoColumnScrollable {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding-right: var(--spacing-sm);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-medium) transparent;
+}
+
+.infoColumnScrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.infoColumnScrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.infoColumnScrollable::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-medium);
+  border-radius: 6px;
+}
+
+.basicInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.basicInfoItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-medium);
+  font-size: var(--font-size-sm);
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+}
+
+/* 役割・ミッションスタイル */
+.roleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.roleItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.roleLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.roleValue {
+  font-size: var(--font-size-md);
+  color: var(--color-text-dark);
+  font-weight: 600;
+}
+
+.missionWrapper {
+  margin: var(--spacing-md) 0;
+}
+
+/* スキルスタンス */
+.skillStance {
+  margin-top: var(--spacing-lg);
+  background-color: rgba(96, 93, 236, 0.05);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+}
+
+.stanceTitle {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stanceText {
+  color: var(--color-text-dark);
+  line-height: 1.6;
+}
+
+.categoryIcon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+}
+
+/* キャリア目標スタイル */
+.careerGoals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.goalSection {
+  margin-bottom: var(--spacing-md);
+}
+
+.goalTitle {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  margin-bottom: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.goalText {
+  font-size: var(--font-size-md);
+  color: var(--color-text-dark);
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.goalSubText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-medium);
+  font-style: italic;
+}
+
+.workStyle {
+  background-color: rgba(255, 142, 110, 0.1);
+  border-left: 3px solid var(--color-secondary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-dark);
+  line-height: 1.6;
+}
+
+/* リンクのスタイル */
+.nameLink {
+  color: var(--color-text-dark);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  display: inline-block;
+}
+
+.nameLink:hover {
+  color: var(--color-primary);
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-fast);
+}
+
+.linkButton:hover {
+  color: var(--color-primary-dark);
+}
+
+.companyLink {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+  margin-top: var(--spacing-md);
+  transition: color var(--transition-fast);
+}
+
+.companyLink:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* モーダルコンテンツのスタイル */
+.modalContent {
+  padding: var(--spacing-md);
+  line-height: 1.6;
+}
+
+.modalContent p {
+  margin-bottom: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .profileLayout {
+    grid-template-columns: minmax(300px, 2fr) 3fr;
+    align-items: start;
+  }
+  
+  .infoColumnScrollable {
+    padding-right: var(--spacing-md);
+  }
+  
+  .roleItem {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .roleLabel {
+    min-width: 80px;
+    margin-right: var(--spacing-md);
+  }
+} 

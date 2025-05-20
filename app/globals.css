@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --mint-green: 0, 196, 167;
+  --coral-pink: 240, 128, 128;
+  --improvement-main: 0, 196, 167;
+  --improvement-base: 255, 255, 255;
+  --improvement-accent: 240, 128, 128;
+  --improvement-sub1: 242, 230, 217;
+  --improvement-sub2: 108, 117, 125;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  color: rgb(var(--improvement-sub2));
+  background-color: #ffffff;
+}
+
+/* アニメーション効果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-out forwards;
+}
