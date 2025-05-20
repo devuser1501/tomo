@@ -14,6 +14,12 @@
   font-family: inherit;
 }
 
+.form textarea::placeholder {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
 .form button {
   background: #0c8;
   color: #fff;
@@ -38,7 +44,8 @@
   font-size: 0.85rem;
   color: #555;
   background-color: rgba(0, 204, 136, 0.1);
-  padding: 10px;
+  padding: 12px;
   border-radius: 6px;
-  margin-top: 8px;
+  margin-top: 12px;
+  line-height: 1.6;
 } 

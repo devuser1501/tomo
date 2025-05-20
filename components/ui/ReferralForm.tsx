@@ -24,7 +24,7 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
         value={v.name} 
         onChange={e => set({ ...v, name: e.target.value })}
       />
-      <label>SNS/プロフィールURL または 画像</label>
+      <label>SNS/プロフィールURL または プロフィール画像</label>
       <UploadField 
         value={v.link} 
         setValue={(s) => set({ ...v, link: s })}
@@ -35,12 +35,12 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
         rows={4} 
         value={v.msg}
         onChange={e => set({ ...v, msg: e.target.value })}
+        placeholder="なぜTomoとマッチしそうな理由、質問などなんでも！"
       />
       <button type="submit">送信</button>
       <p className={styles.note}>
-        成婚したら&nbsp;
-        <strong>{TRIP_DESTINATIONS.join(' / ')}</strong>
-        &nbsp;いずれかへの往復チケットをプレゼント！✈️
+        成婚したら <strong>{TRIP_DESTINATIONS.join(' / ')}</strong> いずれかへの往復チケットをプレゼント！✈️<br />
+        紹介者・被紹介者の方へささかかなお礼ですが、僕のお気に入りの都市を案内するので一緒に楽しみましょう！😁
       </p>
     </form>
   );
