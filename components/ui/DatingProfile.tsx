@@ -209,6 +209,50 @@ const DatingProfile: React.FC = () => {
                 </ProfileSection>
 
                 <ProfileSection 
+                  title="経歴年表" 
+                  icon={<BriefcaseIcon />}
+                >
+                  <div className={styles.timelineContainer}>
+                    <div className={styles.timelineItem}>
+                      <div className={styles.timelineYear}>2001年</div>
+                      <div className={styles.timelineContent}>米国NCへ交換留学、飛び級。</div>
+                    </div>
+                    <div className={styles.timelineItem}>
+                      <div className={styles.timelineYear}>2004年</div>
+                      <div className={styles.timelineContent}>上智大学比較文化学部で国際ビジネス専攻。</div>
+                    </div>
+                    <div className={styles.timelineItem}>
+                      <div className={styles.timelineYear}>2009年</div>
+                      <div className={styles.timelineContent}>三菱商事入社、エネルギー商材の貿易・投資</div>
+                    </div>
+                    <div className={styles.timelineItem}>
+                      <div className={styles.timelineYear}>2014年</div>
+                      <div className={styles.timelineContent}>2年間フランス駐在後に退職。外国籍向けCM、PM、LM全ての業務委託を経験。</div>
+                    </div>
+                    <div className={styles.timelineItem}>
+                      <div className={styles.timelineYear}>2015年</div>
+                      <div className={styles.timelineContent}>現アットハース社を創業。</div>
+                    </div>
+                    <div className={styles.timelineItem}>
+                      <div className={styles.timelineYear}>2017年</div>
+                      <div className={styles.timelineContent}>経産省の現:J-Startup「飛躍」に採択。Slush Helsinki, Tech Crunch Berlinへ公式派遣</div>
+                    </div>
+                    <div className={styles.timelineItem}>
+                      <div className={styles.timelineYear}>2018年</div>
+                      <div className={styles.timelineContent}>
+                        東京都の起業家海外進出支援プログラム「X-HUB TOKYO」ミュンヘンコースに採択<br />
+                        野村グループアクセラレーション「Voyager」に応募200社超の不動産部門1社に採択<br />
+                        Incubate Camp：グロース賞2位、総合4位、EY賞、SMBC賞
+                      </div>
+                    </div>
+                    <div className={styles.timelineItem}>
+                      <div className={styles.timelineYear}>2024年</div>
+                      <div className={styles.timelineContent}>累計1.7億円資金調達。</div>
+                    </div>
+                  </div>
+                </ProfileSection>
+
+                <ProfileSection 
                   title="スキル・専門性" 
                   icon={<CodeIcon />}
                 >
