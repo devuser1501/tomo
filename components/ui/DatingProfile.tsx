@@ -24,7 +24,14 @@ import {
   StarIcon,
   RocketIcon 
 } from './Icons';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
+import { 
+  Dialog, 
+  DialogTrigger, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogClose 
+} from './dialog';
 
 type ProfileMode = 'private' | 'professional';
 
@@ -39,13 +46,13 @@ const DatingProfile: React.FC = () => {
 
   // 会社名をクリックしたときの処理
   const handleCompanyClick = () => {
-    setIsCompanyModalOpen(true);
+    window.open('https://www.athearth.com/about', '_blank', 'noopener,noreferrer');
   };
 
   // Wikipediaリンクをクリックしたときの処理
   const handleWikiClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsWikiModalOpen(true);
+    window.open('https://ja.wikipedia.org/wiki/%E7%B4%80%E9%87%8E%E7%9F%A5%E6%88%90', '_blank', 'noopener,noreferrer');
   };
 
   // 基本情報の項目をカスタマイズして会社名にリンクを追加
@@ -262,7 +269,7 @@ const DatingProfile: React.FC = () => {
 
       {/* 会社情報モーダル */}
       <Dialog open={isCompanyModalOpen} onOpenChange={setIsCompanyModalOpen}>
-        <DialogContent>
+        <DialogContent className={styles.dialogContent}>
           <DialogHeader>
             <DialogTitle>アットハース株式会社</DialogTitle>
           </DialogHeader>
@@ -285,7 +292,7 @@ const DatingProfile: React.FC = () => {
 
       {/* Wikipedia情報モーダル */}
       <Dialog open={isWikiModalOpen} onOpenChange={setIsWikiModalOpen}>
-        <DialogContent>
+        <DialogContent className={styles.dialogContent}>
           <DialogHeader>
             <DialogTitle>紀野 知成 / Tomonari Kino</DialogTitle>
           </DialogHeader>

@@ -51,11 +51,11 @@ export const profile: ProfileData = {
       { label: "休日", value: "不定期" },
       { label: "お酒", value: "時々飲む" },
       { label: "タバコ", value: "吸わない" },
-      { label: "希望のやりとり", value: "デートの約束" }
+      { label: "希望のやりとり", value: "電話、オンライン会話" }
     ],
     lifestyle: [
       { label: "結婚歴", value: "未婚" },
-      { label: "結婚への意思", value: "いい人がいればしたい" },
+      { label: "結婚への意思", value: "はい" },
       { label: "子どもの有無", value: "なし" },
       { label: "子どもの希望", value: "はい" },
       { label: "家事・育児", value: "積極的に参加したい" }
