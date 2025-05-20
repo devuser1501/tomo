@@ -208,7 +208,6 @@ const DatingProfile: React.FC = () => {
               (Wikipedia)
             </button>
           </h1>
-          <ToggleButton mode={mode} onToggle={handleToggle} />
         </div>
         
         <button onClick={scrollToForm} className={styles.contactButton}>
@@ -220,6 +219,10 @@ const DatingProfile: React.FC = () => {
       <div className={styles.profileLayout}>
         <div className={styles.photoColumn}>
           <PhotoCarousel photos={profile.photos} />
+        </div>
+
+        <div className={styles.toggleContainer}>
+          <ToggleButton mode={mode} onToggle={handleToggle} />
         </div>
 
         <div className={styles.infoColumn}>
