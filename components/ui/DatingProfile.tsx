@@ -48,6 +48,13 @@ const DatingProfile: React.FC = () => {
     setMode(newMode);
   };
 
+  const scrollToForm = () => {
+    document.getElementById('referral-form')?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
   // 会社名をクリックしたときの処理
   const handleCompanyClick = () => {
     window.open('https://www.athearth.com/about', '_blank', 'noopener,noreferrer');
@@ -191,16 +198,23 @@ const DatingProfile: React.FC = () => {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>
-          紀野 知成 / Tomonari Kino
-          <button
-            onClick={handleWikiClick}
-            className={styles.wikiButton}
-          >
-            (Wikipedia)
-          </button>
-        </h1>
-        <ToggleButton mode={mode} onToggle={handleToggle} />
+        <div className={styles.titleSection}>
+          <h1 className={styles.title}>
+            紀野 知成 / Tomonari Kino
+            <button
+              onClick={handleWikiClick}
+              className={styles.wikiButton}
+            >
+              (Wikipedia)
+            </button>
+          </h1>
+          <ToggleButton mode={mode} onToggle={handleToggle} />
+        </div>
+        
+        <button onClick={scrollToForm} className={styles.contactButton}>
+          <span className={styles.contactIcon}>💬</span>
+          <span className={styles.contactText}>連絡してみる</span>
+        </button>
       </header>
 
       <div className={styles.profileLayout}>
@@ -261,13 +275,17 @@ const DatingProfile: React.FC = () => {
                       </button>
                     </div>
                     <div className={styles.roleItem}>
+                      <span className={styles.roleLabel}>兼職:</span>
+                      <span className={styles.roleValue}>上智大学 非常勤講師 兼任（AI×英語の起業講座）</span>
+                    </div>
+                    <div className={styles.roleItem}>
                       <span className={styles.roleLabel}>事業:</span>
                       <span className={styles.roleValue}>外国籍人材向けオンライン賃貸プラットフォーム「アットハースホーム」の開発・運営</span>
                     </div>
                   </div>
 
                   <div className={styles.missionWrapper}>
-                    <MissionCard text="テクノロジーとコンテンツで、グローバルに挑戦する人々を支援する" />
+                    <MissionCard text="テクノロジー×不動産事業で、グローバルに挑戦する人々を支援する" />
                   </div>
                 </ProfileSection>
 
@@ -453,7 +471,7 @@ const DatingProfile: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <div className={styles.referralSection}>
+      <div className={styles.referralSection} id="contact-section">
         <h2 className={styles.referralTitle}>友だち紹介フォーム</h2>
         <ReferralTabs mode={referralMode} onChange={setReferralMode} />
         <ReferralForm mode={referralMode} />

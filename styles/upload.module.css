@@ -5,6 +5,12 @@
   flex-wrap: wrap;
 }
 
+.inputContainer {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
 .or {
   font-size: 0.8rem;
   color: #888;
@@ -17,9 +23,20 @@
   border-radius: 6px;
 }
 
-.wrapper input[type="url"] {
-  flex: 1;
-  min-width: 200px;
+.inputContainer input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.errorText {
+  color: #e53e3e;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  position: absolute;
+  bottom: -20px;
+  left: 0;
 }
 
 .wrapper input[type="file"] {
