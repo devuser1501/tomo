@@ -32,6 +32,8 @@ import {
   DialogTitle, 
   DialogClose 
 } from './dialog';
+import { ReferralTabs } from './ReferralTabs';
+import ReferralForm from './ReferralForm';
 
 type ProfileMode = 'private' | 'professional';
 
@@ -39,6 +41,7 @@ const DatingProfile: React.FC = () => {
   const [mode, setMode] = useState<ProfileMode>('private');
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isWikiModalOpen, setIsWikiModalOpen] = useState(false);
+  const [referralMode, setReferralMode] = useState<'friend' | 'self'>('friend');
 
   const handleToggle = (newMode: ProfileMode) => {
     setMode(newMode);
@@ -209,6 +212,20 @@ const DatingProfile: React.FC = () => {
                 </ProfileSection>
 
                 <ProfileSection 
+                  title="実績・経歴ハイライト" 
+                  icon={<TrophyIcon />}
+                >
+                  <BulletList 
+                    items={[
+                      'アットハース創業、累計1.7億円の資金調達達成',
+                      '独自DB基盤のオンライン完結型賃貸サービスモデル確立',
+                      '元 三菱商事にてウラン投資・国際取引等に従事 (フランス駐在経験あり)',
+                      'Incubate Camp 選出 (複数受賞)、経産省・東京都プログラム選抜歴など'
+                    ]}
+                  />
+                </ProfileSection>
+
+                <ProfileSection 
                   title="経歴年表" 
                   icon={<BriefcaseIcon />}
                 >
@@ -262,20 +279,6 @@ const DatingProfile: React.FC = () => {
                     <h3 className={styles.stanceTitle}>スタンス</h3>
                     <p className={styles.stanceText}>フロントエンド/プロトタイピング中心、専門家と連携して推進</p>
                   </div>
-                </ProfileSection>
-
-                <ProfileSection 
-                  title="実績・経歴ハイライト" 
-                  icon={<TrophyIcon />}
-                >
-                  <BulletList 
-                    items={[
-                      'アットハース創業、累計1.7億円の資金調達達成',
-                      '独自DB基盤のオンライン完結型賃貸サービスモデル確立',
-                      '元 三菱商事にてウラン投資・国際取引等に従事 (フランス駐在経験あり)',
-                      'Incubate Camp 選出 (複数受賞)、経産省・東京都プログラム選抜歴など'
-                    ]}
-                  />
                 </ProfileSection>
 
                 <ProfileSection 
@@ -359,6 +362,12 @@ const DatingProfile: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <div className={styles.referralSection}>
+        <h2 className={styles.referralTitle}>友だち紹介フォーム</h2>
+        <ReferralTabs mode={referralMode} onChange={setReferralMode} />
+        <ReferralForm mode={referralMode} />
+      </div>
     </div>
   );
 };

@@ -1,0 +1,44 @@
+.form {
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.form input, 
+.form textarea {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px;
+  font-family: inherit;
+}
+
+.form button {
+  background: #0c8;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.form button:hover {
+  background: #0a6;
+}
+
+.form label {
+  font-weight: 500;
+  margin-bottom: -8px;
+}
+
+.note {
+  font-size: 0.85rem;
+  color: #555;
+  background-color: rgba(0, 204, 136, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+} 
