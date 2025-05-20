@@ -314,6 +314,31 @@
   padding-bottom: var(--spacing-sm);
 }
 
+/* スキルリスト */
+.skillsList {
+  margin-top: var(--spacing-sm);
+}
+
+.skillsList p {
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.6;
+  color: var(--color-text-dark);
+}
+
+.additionalSkills {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: rgba(96, 93, 236, 0.05);
+  border-radius: var(--radius-md);
+}
+
+/* バイオテキスト */
+.bioText p {
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.6;
+  color: var(--color-text-dark);
+}
+
 /* リファラルセクションのスタイル */
 .referralSection {
   margin-top: var(--spacing-xl);

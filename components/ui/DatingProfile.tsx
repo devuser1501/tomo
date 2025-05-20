@@ -41,6 +41,7 @@ const DatingProfile: React.FC = () => {
   const [mode, setMode] = useState<ProfileMode>('private');
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isWikiModalOpen, setIsWikiModalOpen] = useState(false);
+  const [isGiftedModalOpen, setIsGiftedModalOpen] = useState(false);
   const [referralMode, setReferralMode] = useState<'friend' | 'self'>('friend');
 
   const handleToggle = (newMode: ProfileMode) => {
@@ -56,6 +57,65 @@ const DatingProfile: React.FC = () => {
   const handleWikiClick = (e: React.MouseEvent) => {
     e.preventDefault();
     window.open('https://ja.wikipedia.org/wiki/%E7%B4%80%E9%87%8E%E7%9F%A5%E6%88%90', '_blank', 'noopener,noreferrer');
+  };
+
+  // ギフテッドをクリックしたときの処理
+  const handleGiftedClick = () => {
+    setIsGiftedModalOpen(true);
+  };
+
+  // BioTextコンポーネントをカスタマイズして「ギフテッド」にリンクを追加
+  const renderBioWithGiftedLink = (text: string[]) => {
+    return (
+      <div className={styles.bioText}>
+        {text.map((line, index) => {
+          // 「ギフテッド」という文字列を含む行を特別処理
+          if (line.includes('"ギフテッド"')) {
+            const parts = line.split('"ギフテッド"');
+            return (
+              <p key={index}>
+                {parts[0]}
+                <button 
+                  onClick={handleGiftedClick}
+                  className={styles.linkButton}
+                >
+                  "ギフテッド"
+                </button>
+                {parts[1]}
+              </p>
+            );
+          }
+          return <p key={index}>{line}</p>;
+        })}
+      </div>
+    );
+  };
+
+  // スキルリストをカスタマイズして「ギフテッド」にリンクを追加
+  const renderSkillsWithLinks = (skills: string[]) => {
+    return (
+      <div className={styles.skillsList}>
+        {skills.map((skill, index) => {
+          // 「ギフテッド」という文字列を含む行を特別処理
+          if (skill.includes('"ギフテッド"')) {
+            const parts = skill.split('"ギフテッド"');
+            return (
+              <p key={index}>
+                {parts[0]}
+                <button 
+                  onClick={handleGiftedClick}
+                  className={styles.linkButton}
+                >
+                  "ギフテッド"
+                </button>
+                {parts[1]}
+              </p>
+            );
+          }
+          return <p key={index}>{skill}</p>;
+        })}
+      </div>
+    );
   };
 
   // 基本情報の項目をカスタマイズして会社名にリンクを追加
@@ -169,7 +229,7 @@ const DatingProfile: React.FC = () => {
                 </ProfileSection>
 
                 <ProfileSection title="性質">
-                  <BioText text={profile.private.nature} />
+                  {renderBioWithGiftedLink(profile.private.nature)}
                 </ProfileSection>
 
                 <ProfileSection title="性格">
@@ -279,6 +339,11 @@ const DatingProfile: React.FC = () => {
                     <h3 className={styles.stanceTitle}>スタンス</h3>
                     <p className={styles.stanceText}>フロントエンド/プロトタイピング中心、専門家と連携して推進</p>
                   </div>
+                  
+                  <div className={styles.additionalSkills}>
+                    <h3 className={styles.stanceTitle}>その他のスキル</h3>
+                    {renderSkillsWithLinks(profile.professional.skills.slice(0, 4))}
+                  </div>
                 </ProfileSection>
 
                 <ProfileSection 
@@ -357,6 +422,31 @@ const DatingProfile: React.FC = () => {
                 className={styles.companyLink}
               >
                 Wikipediaページを見る
+              </a>
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ギフテッド情報モーダル */}
+      <Dialog open={isGiftedModalOpen} onOpenChange={setIsGiftedModalOpen}>
+        <DialogContent className={styles.dialogContent}>
+          <DialogHeader>
+            <DialogTitle>ギフテッド</DialogTitle>
+          </DialogHeader>
+          <div className={styles.modalContent}>
+            <p>ギフテッドとは、高い潜在能力を持った英才児を指します。</p>
+            <p>一般的に知能指数（IQ）が130以上であることが基準とされることが多く、高い認知能力や創造性を持つ特性があります。</p>
+            <p>ギフテッドは単なる高い知能だけでなく、感受性の強さや独特の認知特性を持つこともあります。</p>
+            <p>日本ではまだ認知度が低いですが、海外ではギフテッド教育として特別なプログラムが提供されている国もあります。</p>
+            <p>
+              <a 
+                href="https://ja.wikipedia.org/wiki/%E3%82%AE%E3%83%95%E3%83%86%E3%83%83%E3%83%89" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={styles.companyLink}
+              >
+                Wikipediaページで詳細を見る
               </a>
             </p>
           </div>
