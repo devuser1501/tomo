@@ -1,33 +1,39 @@
 .container {
-  max-width: 1200px;
+  max-width: 700px;
   margin: 0 auto;
   padding: var(--spacing-lg);
 }
 
 .profileLayout {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: var(--spacing-xl);
 }
 
 .toggleContainer {
   display: flex;
   justify-content: center;
-  margin: 12px 0 16px;
+  margin: 20px 0 40px;
+  width: 100%;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   margin-bottom: var(--spacing-lg);
   position: relative;
+  gap: var(--spacing-md);
 }
 
 .titleSection {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+  text-align: center;
 }
 
 .title {
@@ -37,8 +43,10 @@
   margin-bottom: var(--spacing-xs);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-xs);
   flex-wrap: wrap;
+  text-align: center;
 }
 
 .contactButton {
@@ -55,6 +63,7 @@
   gap: var(--spacing-xs);
   transition: background-color var(--transition-fast);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: var(--spacing-sm);
 }
 
 .contactButton:hover {
@@ -92,20 +101,20 @@
 }
 
 .photoColumn {
-  flex: 0 0 100%;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .infoColumn {
-  flex: 1;
-  overflow-y: auto;
-  max-height: 80vh;
-  padding-right: var(--spacing-md);
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .infoColumnScrollable {
-  max-height: 80vh;
-  overflow-y: auto;
-  padding-right: var(--spacing-sm);
+  overflow-y: visible;
+  padding-right: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-medium) transparent;
 }
@@ -401,8 +410,7 @@
 
 @media (min-width: 768px) {
   .profileLayout {
-    grid-template-columns: minmax(300px, 2fr) 3fr;
-    align-items: start;
+    align-items: center;
   }
   
   .infoColumnScrollable {

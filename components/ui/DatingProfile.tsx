@@ -278,12 +278,20 @@ const DatingProfile: React.FC = () => {
                       </button>
                     </div>
                     <div className={styles.roleItem}>
+                      <span className={styles.roleLabel}>事業:</span>
+                      <span className={styles.roleValue}>外国籍人材向けオンライン賃貸プラットフォーム「アットハースホーム」の開発・運営</span>
+                    </div>
+                    <div className={styles.roleItem}>
                       <span className={styles.roleLabel}>兼職:</span>
                       <span className={styles.roleValue}>上智大学 非常勤講師 兼任（AI×英語の起業講座）</span>
                     </div>
                     <div className={styles.roleItem}>
-                      <span className={styles.roleLabel}>事業:</span>
-                      <span className={styles.roleValue}>外国籍人材向けオンライン賃貸プラットフォーム「アットハースホーム」の開発・運営</span>
+                      <span className={styles.roleLabel}>年収:</span>
+                      <span className={styles.roleValue}>1000-1200万円（会社の業績により変動）</span>
+                    </div>
+                    <div className={styles.roleItem}>
+                      <span className={styles.roleLabel}>不労所得:</span>
+                      <span className={styles.roleValue}>400-500万円</span>
                     </div>
                   </div>
 
@@ -360,11 +368,6 @@ const DatingProfile: React.FC = () => {
                     <h3 className={styles.stanceTitle}>スタンス</h3>
                     <p className={styles.stanceText}>フロントエンド/プロトタイピング中心、専門家と連携して推進</p>
                   </div>
-                  
-                  <div className={styles.additionalSkills}>
-                    <h3 className={styles.stanceTitle}>その他のスキル</h3>
-                    {renderSkillsWithLinks(profile.professional.skills.slice(0, 4))}
-                  </div>
                 </ProfileSection>
 
                 <ProfileSection 
@@ -389,8 +392,8 @@ const DatingProfile: React.FC = () => {
                     </div>
                     
                     <div className={styles.goalSection}>
-                      <h3 className={styles.goalTitle}>希望する働き方</h3>
-                      <p className={styles.workStyle}>{workStyle}</p>
+                      <h3 className={styles.goalTitle}>目指している働き方</h3>
+                      <p className={styles.workStyle}>・完全リモート（東京ベース/年半分海外）<br />・本業 + 業務委託（週2-3日）または社外取締役/顧問希望</p>
                     </div>
                   </div>
                 </ProfileSection>
