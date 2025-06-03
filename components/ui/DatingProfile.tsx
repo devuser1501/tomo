@@ -30,7 +30,8 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogClose 
+  DialogClose,
+  DialogDescription
 } from './dialog';
 import { ReferralTabs } from './ReferralTabs';
 import ReferralForm from './ReferralForm';
@@ -405,9 +406,15 @@ const DatingProfile: React.FC = () => {
 
       {/* 会社情報モーダル */}
       <Dialog open={isCompanyModalOpen} onOpenChange={setIsCompanyModalOpen}>
-        <DialogContent className={styles.dialogContent}>
+        <DialogContent 
+          className={styles.dialogContent}
+          aria-describedby="company-modal-description"
+        >
           <DialogHeader>
             <DialogTitle>アットハース株式会社</DialogTitle>
+            <DialogDescription id="company-modal-description">
+              会社の詳細情報をご確認いただけます。
+            </DialogDescription>
           </DialogHeader>
           <div className={styles.modalContent}>
             <p>家を借りれず困っていた海外の友人を助けるために不動産のIT企業を創業→10年間経営。</p>
@@ -428,9 +435,15 @@ const DatingProfile: React.FC = () => {
 
       {/* Wikipedia情報モーダル */}
       <Dialog open={isWikiModalOpen} onOpenChange={setIsWikiModalOpen}>
-        <DialogContent className={styles.dialogContent}>
+        <DialogContent 
+          className={styles.dialogContent}
+          aria-describedby="wiki-modal-description"
+        >
           <DialogHeader>
             <DialogTitle>紀野 知成 / Tomonari Kino</DialogTitle>
+            <DialogDescription id="wiki-modal-description">
+              Wikipedia上の人物情報をご覧いただけます。
+            </DialogDescription>
           </DialogHeader>
           <div className={styles.modalContent}>
             <p>紀野 知成（きの ともなり、1984年 - ）は、日本の実業家。アットハース株式会社創業者兼CEO。</p>
@@ -454,9 +467,15 @@ const DatingProfile: React.FC = () => {
 
       {/* ギフテッド情報モーダル */}
       <Dialog open={isGiftedModalOpen} onOpenChange={setIsGiftedModalOpen}>
-        <DialogContent className={styles.dialogContent}>
+        <DialogContent 
+          className={styles.dialogContent}
+          aria-describedby="gifted-modal-description"
+        >
           <DialogHeader>
             <DialogTitle>ギフテッド</DialogTitle>
+            <DialogDescription id="gifted-modal-description">
+              ギフテッドに関する詳細な説明をご覧いただけます。
+            </DialogDescription>
           </DialogHeader>
           <div className={styles.modalContent}>
             <p>ギフテッドとは、高い潜在能力を持った英才児を指します。</p>

@@ -62,9 +62,9 @@ export const profile: ProfileData = {
     ],
     bio: [
       "※写真は全て直近&無加工です📷",
-      "4年程付き合った彼女と何度も話し合った結果お別れしました。(国際感覚や結婚希望タイミングのズレなど)",
+      "5年弱付き合った彼女と何度も話し合った結果お別れしました。",
       "ずっと挑戦×サバイバルモードの人生だったので、誰かを愛する準備がやっとできました。愛する人と幸せな家庭をつくる人生の第二幕を始めたいです。",
-      "お電話で仲良くなってからカフェなどご一緒出来たら嬉しいです😊"
+      "事前にお互いの相性を早く知れると思うので、なるべく隠さず自己開示の長文書きました😂お電話やカフェなどで仲良くなれたら嬉しいです😊"
     ],
     dailyLife: [
       "🌍普段の生活",
@@ -171,7 +171,6 @@ export const profile: ProfileData = {
     { id: 5, src: "/images/img5.jpg", alt: "Tomo プロフィール写真 5" },
     { id: 6, src: "/images/img6.jpg", alt: "Tomo プロフィール写真 6" },
     { id: 7, src: "/images/img7.jpg", alt: "Tomo プロフィール写真 7" },
-    { id: 8, src: "/images/img8.jpg", alt: "Tomo プロフィール写真 8" },
-    { id: 9, src: "/images/img9.PNG", alt: "Tomo プロフィール写真 9" }
+    { id: 8, src: "/images/img8.jpg", alt: "Tomo プロフィール写真 8" }
   ]
 }; 
