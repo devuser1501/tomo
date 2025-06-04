@@ -1,19 +1,28 @@
 "use client";
 
 import styles from '../../styles/tabs.module.css';
+import { TRANSLATIONS, Language } from '../../data/translations';
 
 type Mode = 'friend' | 'self';
 
-export function ReferralTabs({mode, onChange}: {mode: Mode; onChange: (m: Mode) => void}) {
+interface ReferralTabsProps {
+  mode: Mode;
+  onChange: (m: Mode) => void;
+  language: Language;
+}
+
+export function ReferralTabs({mode, onChange, language}: ReferralTabsProps) {
+  const t = TRANSLATIONS[language];
+  
   return (
     <div className={styles.root}>
-      {['friend', 'self'].map(k => (
+      {(['friend', 'self'] as const).map(k => (
         <button 
           key={k}
           className={mode === k ? styles.active : styles.btn}
-          onClick={() => onChange(k as Mode)}
+          onClick={() => onChange(k)}
         >
-          {k === 'friend' ? '友達を紹介する' : '自分が興味ある'}
+          {k === 'friend' ? t.tabs.friend : t.tabs.self}
         </button>
       ))}
     </div>

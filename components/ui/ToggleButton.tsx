@@ -2,13 +2,17 @@
 
 import React from 'react';
 import styles from '../../styles/toggle.module.css';
+import { TRANSLATIONS, Language } from '../../data/translations';
 
 interface ToggleButtonProps {
   mode: 'private' | 'professional';
   onToggle: (mode: 'private' | 'professional') => void;
+  language: Language;
 }
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ mode, onToggle }) => {
+const ToggleButton: React.FC<ToggleButtonProps> = ({ mode, onToggle, language }) => {
+  const t = TRANSLATIONS[language];
+  
   const handlePrivateClick = () => {
     if (mode !== 'private') {
       onToggle('private');
@@ -43,7 +47,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ mode, onToggle }) => {
           aria-pressed={mode === 'private'}
           type="button"
         >
-          プライベート
+          <span className={styles.buttonText}>{t.tabs.private}</span>
         </button>
         <button
           className={`${styles.toggleButton} ${styles.professional} ${
@@ -54,7 +58,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ mode, onToggle }) => {
           aria-pressed={mode === 'professional'}
           type="button"
         >
-          キャリア
+          <span className={styles.buttonText}>{t.tabs.career}</span>
         </button>
         <div
           className={`${styles.activeIndicator} ${

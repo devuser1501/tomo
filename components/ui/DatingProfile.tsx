@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../../styles/layout.module.css';
 import { profile } from '../../data/profile';
+import { TRANSLATIONS, Language } from '../../data/translations';
+import { incrementCounter } from '../../utils/incrementCounter';
+import { testSupabaseConnection, getCurrentCounters, ensureCountersExist } from '../../utils/supabaseStatusCheck';
 import PhotoCarousel from './PhotoCarousel';
 import ToggleButton from './ToggleButton';
 import {
@@ -35,18 +38,130 @@ import {
 } from './dialog';
 import { ReferralTabs } from './ReferralTabs';
 import ReferralForm from './ReferralForm';
+import { supabase } from '../../lib/supabaseClient';
 
 type ProfileMode = 'private' | 'professional';
 
 const DatingProfile: React.FC = () => {
   const [mode, setMode] = useState<ProfileMode>('private');
+  const [language, setLanguage] = useState<Language>('ja');
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isWikiModalOpen, setIsWikiModalOpen] = useState(false);
   const [isGiftedModalOpen, setIsGiftedModalOpen] = useState(false);
   const [referralMode, setReferralMode] = useState<'friend' | 'self'>('friend');
+  
+  // 🔢 カウンター表示用の状態
+  const [likeCount, setLikeCount] = useState<number | null>(null);
+  const [pageViews, setPageViews] = useState<number | null>(null);
+  const [formSubmissions, setFormSubmissions] = useState<number | null>(null);
+
+  // 現在の言語のテキストを取得
+  const t = TRANSLATIONS[language];
+
+  // 🔍 Supabase接続テスト＆カウンター取得（改善版）
+  useEffect(() => {
+    // Supabase機能が有効な場合のみ実行
+    if (process.env.NEXT_PUBLIC_SUPABASE_ENABLED !== 'true') {
+      console.log('ℹ️ Supabase機能は現在無効化されています');
+      return;
+    }
+
+    const initializeCounters = async () => {
+      console.log('🔍 カウンター初期化開始');
+      
+      // Supabase接続テスト
+      const testResult = await testSupabaseConnection();
+      console.log('🔍 接続テスト結果:', testResult);
+      
+      if (testResult.success) {
+        // 🔧 必要なカウンターが存在するか確認・作成
+        await ensureCountersExist();
+        
+        // 個別にカウンターを取得
+        try {
+          const likesResult = await supabase
+            .from('counters')
+            .select('value')
+            .eq('name', 'likes')
+            .single();
+          
+          const pageViewsResult = await supabase
+            .from('counters')
+            .select('value')
+            .eq('name', 'pageViews')
+            .single();
+            
+          const formsResult = await supabase
+            .from('counters')
+            .select('value')
+            .eq('name', 'formSubmissions')
+            .single();
+
+          console.log('📊 カウンター取得結果:', {
+            likes: likesResult,
+            pageViews: pageViewsResult,
+            forms: formsResult
+          });
+
+          if (likesResult.data) setLikeCount(likesResult.data.value);
+          if (pageViewsResult.data) setPageViews(pageViewsResult.data.value);
+          if (formsResult.data) setFormSubmissions(formsResult.data.value);
+          
+        } catch (error) {
+          console.error('❌ カウンター個別取得エラー:', error);
+        }
+      }
+    };
+    
+    initializeCounters();
+  }, []);
+
+  // 🔢 ページ訪問カウンター（ページ読み込み時に実行）
+  useEffect(() => {
+    // Supabase機能が有効な場合のみ実行
+    if (process.env.NEXT_PUBLIC_SUPABASE_ENABLED !== 'true') {
+      return;
+    }
+
+    const incrementPageViews = async () => {
+      console.log('👀 ページビューカウンター実行');
+      const newValue = await incrementCounter('pageViews');
+      if (newValue !== null) {
+        setPageViews(newValue);
+        console.log(`✅ ページビュー数更新: ${newValue}`);
+      } else {
+        console.error('❌ ページビュー数更新失敗');
+      }
+    };
+    
+    incrementPageViews();
+  }, []);
+
+  // ❤️ Likeボタンのハンドラー（改善版）
+  const handleLike = async () => {
+    // Supabase機能が有効な場合のみ実行
+    if (process.env.NEXT_PUBLIC_SUPABASE_ENABLED !== 'true') {
+      console.log('ℹ️ Supabase機能が無効のため、Likeカウンターは動作しません');
+      return;
+    }
+
+    console.log('👍 Likeボタンがクリックされました');
+    const newValue = await incrementCounter('likes');
+    if (newValue !== null) {
+      setLikeCount(newValue);
+      console.log(`✅ Like数更新: ${newValue}`);
+    } else {
+      console.error('❌ Like数更新失敗');
+    }
+  };
 
   const handleToggle = (newMode: ProfileMode) => {
     setMode(newMode);
+  };
+
+  // 🔧 言語切替機能を復活
+  const handleLanguageToggle = () => {
+    setLanguage(language === 'ja' ? 'en' : 'ja');
   };
 
   const scrollToForm = () => {
@@ -151,50 +266,91 @@ const DatingProfile: React.FC = () => {
     );
   };
 
-  // スキルカテゴリーの定義
-  const skillCategories = [
-    {
-      title: 'コアスキル',
-      tags: [
-        'プロダクトマネジメント', 
-        'グローバル事業開発', 
-        'AI/LLM活用', 
-        'DX推進'
-      ],
-      icon: <StarIcon className={styles.categoryIcon} />
-    },
-    {
-      title: 'ビジネススキル',
-      tags: [
-        '多言語コミュニケーション', 
-        'CRM戦略・自動化'
-      ],
-      icon: <BriefcaseIcon className={styles.categoryIcon} />
-    },
-    {
-      title: '技術スタック',
-      tags: [
-        'React', 
-        'JavaScript', 
-        'Python', 
-        'AI/LLMツール', 
-        'Git/GitHub',
-        'Vercel',
-        'Hasura(GraphQL)',
-        'Docker(基礎)'
-      ],
-      icon: <CodeIcon className={styles.categoryIcon} />
-    }
-  ];
+  // 翻訳されたスキルカテゴリーを取得
+  const getSkillCategories = () => {
+    const skillIcons = [
+      <StarIcon key="star" className={styles.categoryIcon} />,
+      <BriefcaseIcon key="briefcase" className={styles.categoryIcon} />,
+      <CodeIcon key="code" className={styles.categoryIcon} />
+    ];
 
-  // 将来の展望リスト
-  const futureVisions = [
-    '世界のどこにでも自分の場所があるようなボーダレスな社会の実現',
-    '「外国人」という概念が無くなった世界を目指す'
-  ];
+    return t.career.skillCategories.map((category, index) => ({
+      title: category.title,
+      tags: [...category.tags] as string[],
+      icon: skillIcons[index]
+    }));
+  };
 
-  // 希望する働き方
-  const workStyle = '完全リモート（東京ベース/年半分海外）、業務委託（週2-3日）または社外取締役/顧問希望';
+  // 基本情報のラベルを翻訳する関数
+  const getTranslatedBasics = () => {
+    const labelMap: { [key: string]: string } = {
+      "年齢": t.form.basic.age,
+      "居住地": t.form.basic.location,
+      "出身地": t.form.basic.birthplace,
+      "身長": t.form.basic.height,
+      "体型": t.form.basic.bodyType,
+      "血液型": t.form.basic.bloodType,
+      "兄弟・姉妹": t.form.basic.siblings,
+      "同居人": t.form.basic.living,
+      "休日": t.form.basic.holiday,
+      "お酒": t.form.basic.alcohol,
+      "タバコ": t.form.basic.smoking,
+      "希望のやりとり": t.form.basic.contact
+    };
+
+    const valueMap: { [key: string]: string } = {
+      "40歳": t.answer.basic.age_40,
+      "東京都 杉並区": t.answer.basic.location_tokyo,
+      "神奈川県 横須賀/秋田": t.answer.basic.birthplace,
+      "170cm": t.answer.basic.height_170,
+      "筋肉質": t.answer.basic.bodyType_muscular,
+      "B型": t.answer.basic.bloodType_b,
+      "次男/次女": t.answer.basic.siblings,
+      "一人暮らし": t.answer.basic.living_alone,
+      "不定期": t.answer.basic.holiday_irregular,
+      "時々飲む": t.answer.basic.alcohol_sometimes,
+      "吸わない": t.answer.basic.smoking_no,
+      "電話、オンライン会話": t.answer.basic.contact_phone_online
+    };
+
+    return profile.private.basics.map(item => ({
+      ...item,
+      label: labelMap[item.label] || item.label,
+      value: valueMap[item.value] || item.value
+    }));
+  };
+
+  // 恋愛・結婚情報のラベルを翻訳する関数
+  const getTranslatedLifestyle = () => {
+    const labelMap: { [key: string]: string } = {
+      "結婚歴": t.form.love.maritalStatus,
+      "結婚への意思": t.form.love.marriageIntent,
+      "子どもの有無": t.form.love.children,
+      "子どもの希望": t.form.love.childrenDesire,
+      "家事・育児": t.form.love.housework
+    };
+
+    const valueMap: { [key: string]: string } = {
+      "未婚": t.answer.love.maritalStatus_single,
+      "はい": t.answer.love.marriage_yes,
+      "なし": t.answer.love.children_none,
+      "料理・掃除得意。育児も頑張ります！": t.answer.love.housework
+    };
+
+    return profile.private.lifestyle.map(item => {
+      // 「子どもの希望」の「はい」は別のキーを使用
+      let translatedValue = valueMap[item.value];
+      if (item.label === "子どもの希望" && item.value === "はい") {
+        translatedValue = t.answer.love.children_desire_yes;
+      }
+
+      return {
+        ...item,
+        label: labelMap[item.label] || item.label,
+        value: translatedValue || item.value
+      };
+    });
+  };
 
   return (
     <div className={styles.container}>
@@ -206,195 +362,288 @@ const DatingProfile: React.FC = () => {
               onClick={handleWikiClick}
               className={styles.wikiButton}
             >
-              (Wikipedia)
+              {t.header.wikiButton}
             </button>
           </h1>
         </div>
         
-        <button onClick={scrollToForm} className={styles.contactButton}>
-          <span className={styles.contactIcon}>💬</span>
-          <span className={styles.contactText}>連絡してみる</span>
-        </button>
+        {/* Header右側のアクションエリア */}
+        <div className="flex items-center justify-center gap-3">
+          {/* 🌐 言語切替ボタン */}
+          <button
+            type="button"
+            onClick={handleLanguageToggle}
+            className="px-4 py-2 min-w-[120px] text-sm font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 hover:border-gray-400 transition-all duration-200 flex items-center justify-center gap-1"
+          >
+            🌐 {t.language.toggleButton}
+          </button>
+          
+          {/* ❤️ Likeボタン - 条件付き表示 */}
+          {process.env.NEXT_PUBLIC_SUPABASE_ENABLED === 'true' && (
+            <button 
+              onClick={handleLike}
+              className="px-4 py-2 min-w-[120px] text-sm font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <span className="text-red-500">❤️</span>
+              <span>Like {likeCount !== null ? `(${likeCount})` : '(0)'}</span>
+            </button>
+          )}
+          
+          {/* 💬 連絡してみるボタン（メインCTA） */}
+          <button 
+            onClick={scrollToForm} 
+            className="px-4 py-2 min-w-[120px] text-sm font-semibold rounded-full text-white bg-teal-500 hover:bg-teal-600 shadow-md transition-all duration-200 flex items-center justify-center gap-1"
+          >
+            <span>💬</span>
+            <span>{t.header.contactButton}</span>
+          </button>
+        </div>
       </header>
 
       <div className={styles.profileLayout}>
         <div className={styles.photoColumn}>
           <PhotoCarousel photos={profile.photos} />
+          
+          {/* 📊 カウンター表示パネル - 一時的に非表示 */}
+          {process.env.NEXT_PUBLIC_SUPABASE_ENABLED === 'true' && (
+            <div style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+              borderRadius: '16px',
+              padding: '20px',
+              marginTop: '20px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+              border: '1px solid #e2e8f0'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                marginBottom: '16px',
+                color: '#475569',
+                fontSize: '14px',
+                fontWeight: '600',
+                letterSpacing: '0.5px'
+              }}>
+                📊 アクティビティ
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '16px',
+                textAlign: 'center'
+              }}>
+                <div style={{ 
+                  padding: '12px 8px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+                  border: '1px solid #fca5a5'
+                }}>
+                  <div style={{ fontSize: '24px', marginBottom: '4px' }}>❤️</div>
+                  <div style={{ 
+                    fontWeight: 'bold', 
+                    color: '#dc2626',
+                    fontSize: '18px',
+                    marginBottom: '2px'
+                  }}>
+                    {likeCount !== null ? likeCount : '-'}
+                  </div>
+                  <div style={{ color: '#991b1b', fontSize: '11px', fontWeight: '500' }}>
+                    Likes
+                  </div>
+                </div>
+                
+                <div style={{ 
+                  padding: '12px 8px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                  border: '1px solid #93c5fd'
+                }}>
+                  <div style={{ fontSize: '24px', marginBottom: '4px' }}>👀</div>
+                  <div style={{ 
+                    fontWeight: 'bold', 
+                    color: '#2563eb',
+                    fontSize: '18px',
+                    marginBottom: '2px'
+                  }}>
+                    {pageViews !== null ? pageViews : '-'}
+                  </div>
+                  <div style={{ color: '#1d4ed8', fontSize: '11px', fontWeight: '500' }}>
+                    Views
+                  </div>
+                </div>
+                
+                <div style={{ 
+                  padding: '12px 8px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+                  border: '1px solid #86efac'
+                }}>
+                  <div style={{ fontSize: '24px', marginBottom: '4px' }}>📨</div>
+                  <div style={{ 
+                    fontWeight: 'bold', 
+                    color: '#16a34a',
+                    fontSize: '18px',
+                    marginBottom: '2px'
+                  }}>
+                    {formSubmissions !== null ? formSubmissions : '-'}
+                  </div>
+                  <div style={{ color: '#15803d', fontSize: '11px', fontWeight: '500' }}>
+                    Messages
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className={styles.toggleContainer}>
-          <ToggleButton mode={mode} onToggle={handleToggle} />
+          <ToggleButton mode={mode} onToggle={handleToggle} language={language} />
         </div>
 
         <div className={styles.infoColumn}>
           <div className={styles.infoColumnScrollable}>
             {mode === 'private' ? (
               <>
-                <ProfileSection title="自己紹介">
-                  <BioText text={profile.private.bio} />
+                <ProfileSection title={t.sections.bio}>
+                  <BioText text={[...t.private.bio]} />
                 </ProfileSection>
 
-                <ProfileSection title="基本情報">
-                  <InfoList items={profile.private.basics} />
+                <ProfileSection title={t.sections.basics}>
+                  <InfoList items={getTranslatedBasics()} />
                 </ProfileSection>
 
-                <ProfileSection title="恋愛・結婚">
-                  <InfoList items={profile.private.lifestyle} />
+                <ProfileSection title={t.sections.loveAndMarriage}>
+                  <InfoList items={getTranslatedLifestyle()} />
                 </ProfileSection>
 
-                <ProfileSection title="普段の生活">
-                  <BioText text={profile.private.dailyLife} />
+                <ProfileSection title={t.sections.dailyLife}>
+                  <BioText text={[...t.private.dailyLife]} />
                 </ProfileSection>
 
-                <ProfileSection title="性質">
-                  {renderBioWithGiftedLink(profile.private.nature)}
+                <ProfileSection title={t.sections.nature}>
+                  {renderBioWithGiftedLink([...t.private.nature])}
                 </ProfileSection>
 
-                <ProfileSection title="性格">
-                  <BioText text={profile.private.personality} />
+                <ProfileSection title={t.sections.personality}>
+                  <BioText text={[...t.private.personality]} />
                 </ProfileSection>
 
-                <ProfileSection title="過去">
-                  <BioText text={profile.private.past} />
+                <ProfileSection title={t.sections.past}>
+                  <BioText text={[...t.private.past]} />
                 </ProfileSection>
               </>
             ) : (
               <>
                 <ProfileSection 
-                  title="現在の役割・ミッション" 
+                  title={t.sections.currentRole}
                   icon={<BriefcaseIcon />}
                 >
                   <div className={styles.roleInfo}>
                     <div className={styles.roleItem}>
-                      <span className={styles.roleLabel}>役割:</span>
-                      <span className={styles.roleValue}>起業家 / プロダクト責任者 (CPO候補)</span>
+                      <span className={styles.roleLabel}>{t.career.role}</span>
+                      <span className={styles.roleValue}>{t.career.roleValue}</span>
                     </div>
                     <div className={styles.roleItem}>
-                      <span className={styles.roleLabel}>会社:</span>
+                      <span className={styles.roleLabel}>{t.career.company}</span>
                       <button 
                         onClick={handleCompanyClick}
                         className={styles.linkButton}
                       >
-                        アットハース株式会社 (創業者 / CEO)
+                        {t.career.companyValue}
                       </button>
                     </div>
                     <div className={styles.roleItem}>
-                      <span className={styles.roleLabel}>事業:</span>
-                      <span className={styles.roleValue}>外国籍人材向けオンライン賃貸プラットフォーム「アットハースホーム」の開発・運営</span>
+                      <span className={styles.roleLabel}>{t.career.business}</span>
+                      <span className={styles.roleValue}>{t.career.businessValue}</span>
                     </div>
                     <div className={styles.roleItem}>
-                      <span className={styles.roleLabel}>兼職:</span>
-                      <span className={styles.roleValue}>上智大学 非常勤講師 兼任（AI×英語の起業講座）</span>
+                      <span className={styles.roleLabel}>{t.career.sideBusiness}</span>
+                      <span className={styles.roleValue}>{t.career.sideBusinessValue}</span>
                     </div>
                     <div className={styles.roleItem}>
-                      <span className={styles.roleLabel}>年収:</span>
-                      <span className={styles.roleValue}>1000-1200万円（会社の業績により変動）</span>
+                      <span className={styles.roleLabel}>{t.career.income}</span>
+                      <span className={styles.roleValue}>{t.career.incomeValue}</span>
                     </div>
                     <div className={styles.roleItem}>
-                      <span className={styles.roleLabel}>不労所得:</span>
-                      <span className={styles.roleValue}>400-500万円</span>
+                      <span className={styles.roleLabel}>{t.career.passiveIncome}</span>
+                      <span className={styles.roleValue}>{t.career.passiveIncomeValue}</span>
                     </div>
                   </div>
 
                   <div className={styles.missionWrapper}>
-                    <MissionCard text="テクノロジー×不動産事業で、グローバルに挑戦する人々を支援する" />
+                    <MissionCard text={t.career.mission} />
                   </div>
                 </ProfileSection>
 
                 <ProfileSection 
-                  title="実績・経歴ハイライト" 
+                  title={t.sections.achievements}
                   icon={<TrophyIcon />}
                 >
-                  <BulletList 
-                    items={[
-                      'アットハース創業、累計1.7億円の資金調達達成',
-                      '独自DB基盤のオンライン完結型賃貸サービスモデル確立',
-                      '元 三菱商事にてウラン投資・国際取引等に従事 (フランス駐在経験あり)',
-                      'Incubate Camp 選出 (複数受賞)、経産省・東京都プログラム選抜歴など'
-                    ]}
-                  />
+                  <BulletList items={[...t.career.achievements] as string[]} />
                 </ProfileSection>
 
                 <ProfileSection 
-                  title="経歴年表" 
+                  title={t.sections.careerHistory}
                   icon={<BriefcaseIcon />}
                 >
                   <div className={styles.timelineContainer}>
-                    <div className={styles.timelineItem}>
-                      <div className={styles.timelineYear}>2001年</div>
-                      <div className={styles.timelineContent}>米国NCへ交換留学、飛び級。</div>
-                    </div>
-                    <div className={styles.timelineItem}>
-                      <div className={styles.timelineYear}>2004年</div>
-                      <div className={styles.timelineContent}>上智大学比較文化学部で国際ビジネス専攻。</div>
-                    </div>
-                    <div className={styles.timelineItem}>
-                      <div className={styles.timelineYear}>2009年</div>
-                      <div className={styles.timelineContent}>三菱商事入社、エネルギー商材の貿易・投資</div>
-                    </div>
-                    <div className={styles.timelineItem}>
-                      <div className={styles.timelineYear}>2014年</div>
-                      <div className={styles.timelineContent}>2年間フランス駐在後に退職。外国籍向けCM、PM、LM全ての業務委託を経験。</div>
-                    </div>
-                    <div className={styles.timelineItem}>
-                      <div className={styles.timelineYear}>2015年</div>
-                      <div className={styles.timelineContent}>現アットハース社を創業。</div>
-                    </div>
-                    <div className={styles.timelineItem}>
-                      <div className={styles.timelineYear}>2017年</div>
-                      <div className={styles.timelineContent}>経産省の現:J-Startup「飛躍」に採択。Slush Helsinki, Tech Crunch Berlinへ公式派遣</div>
-                    </div>
-                    <div className={styles.timelineItem}>
-                      <div className={styles.timelineYear}>2018年</div>
-                      <div className={styles.timelineContent}>
-                        東京都の起業家海外進出支援プログラム「X-HUB TOKYO」ミュンヘンコースに採択<br />
-                        野村グループアクセラレーション「Voyager」に応募200社超の不動産部門1社に採択<br />
-                        Incubate Camp：グロース賞2位、総合4位、EY賞、SMBC賞
+                    {t.career.timeline.map((item, index) => (
+                      <div key={index} className={styles.timelineItem}>
+                        <div className={styles.timelineYear}>{item.year}</div>
+                        <div className={styles.timelineContent}>
+                          {item.content.split('\n').map((line, lineIndex) => (
+                            <span key={lineIndex}>
+                              {line}
+                              {lineIndex < item.content.split('\n').length - 1 && <br />}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <div className={styles.timelineItem}>
-                      <div className={styles.timelineYear}>2024年</div>
-                      <div className={styles.timelineContent}>累計1.7億円資金調達。</div>
-                    </div>
+                    ))}
                   </div>
                 </ProfileSection>
 
                 <ProfileSection 
-                  title="スキル・専門性" 
+                  title={t.sections.skills}
                   icon={<CodeIcon />}
                 >
-                  <SkillCategories categories={skillCategories} />
+                  <SkillCategories categories={getSkillCategories()} />
                   
                   <div className={styles.skillStance}>
-                    <h3 className={styles.stanceTitle}>スタンス</h3>
-                    <p className={styles.stanceText}>フロントエンド/プロトタイピング中心、専門家と連携して推進</p>
+                    <h3 className={styles.stanceTitle}>{t.career.stance}</h3>
+                    <p className={styles.stanceText}>{t.career.stanceText}</p>
                   </div>
                 </ProfileSection>
 
                 <ProfileSection 
-                  title="キャリアの展望" 
+                  title={t.sections.careerGoals}
                   icon={<TargetIcon />}
                 >
                   <div className={styles.careerGoals}>
                     <div className={styles.goalSection}>
-                      <h3 className={styles.goalTitle}>目標</h3>
-                      <p className={styles.goalText}>CEO/CPO (最高プロダクト責任者) を目指す</p>
+                      <h3 className={styles.goalTitle}>{t.career.goals.objective}</h3>
+                      <p className={styles.goalText}>{t.career.goals.objectiveText}</p>
                     </div>
                     
                     <div className={styles.goalSection}>
-                      <h3 className={styles.goalTitle}>2025進化目標</h3>
-                      <p className={styles.goalText}>AIプロダクト開発能力の深化</p>
-                      <p className={styles.goalSubText}>高度AI技術(RAG等)活用、企画〜実装〜グロース貢献</p>
+                      <h3 className={styles.goalTitle}>{t.career.goals.evolution}</h3>
+                      <p className={styles.goalText}>{t.career.goals.evolutionText}</p>
+                      <p className={styles.goalSubText}>{t.career.goals.evolutionSubText}</p>
                     </div>
                     
                     <div className={styles.goalSection}>
-                      <h3 className={styles.goalTitle}>今後の展望</h3>
-                      <BulletList items={futureVisions} />
+                      <h3 className={styles.goalTitle}>{t.career.goals.vision}</h3>
+                      <BulletList items={[...t.career.goals.visionItems] as string[]} />
                     </div>
                     
                     <div className={styles.goalSection}>
-                      <h3 className={styles.goalTitle}>目指している働き方</h3>
-                      <p className={styles.workStyle}>・完全リモート（東京ベース/年半分海外）<br />・本業 + 業務委託（週2-3日）または社外取締役/顧問希望</p>
+                      <h3 className={styles.goalTitle}>{t.career.goals.workStyle}</h3>
+                      <p className={styles.workStyle}>
+                        {t.career.goals.workStyleText.split('\n').map((line, index) => (
+                          <span key={index}>
+                            {line}
+                            {index === 0 && <br />}
+                          </span>
+                        ))}
+                      </p>
                     </div>
                   </div>
                 </ProfileSection>
@@ -411,14 +660,15 @@ const DatingProfile: React.FC = () => {
           aria-describedby="company-modal-description"
         >
           <DialogHeader>
-            <DialogTitle>アットハース株式会社</DialogTitle>
+            <DialogTitle>{t.modals.companyTitle}</DialogTitle>
             <DialogDescription id="company-modal-description">
-              会社の詳細情報をご確認いただけます。
+              {t.modals.companyDescription}
             </DialogDescription>
           </DialogHeader>
           <div className={styles.modalContent}>
-            <p>家を借りれず困っていた海外の友人を助けるために不動産のIT企業を創業→10年間経営。</p>
-            <p>外国籍向け事業、広告からLPO、EFOなどマーケ改善、CRMによる脱属人ISの設計、新規事業のオペレーション改善と自動化（インサイドセールスの脱属人化とフィールドセールスへの滑らかな繋ぎ込みによるOMO最適化）が得意。</p>
+            {t.modals.companyContent.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
             <p>
               <a 
                 href="https://www.athearth.com/about" 
@@ -426,7 +676,7 @@ const DatingProfile: React.FC = () => {
                 rel="noopener noreferrer"
                 className={styles.companyLink}
               >
-                会社ウェブサイトを見る
+                {t.modals.companyLink}
               </a>
             </p>
           </div>
@@ -440,17 +690,15 @@ const DatingProfile: React.FC = () => {
           aria-describedby="wiki-modal-description"
         >
           <DialogHeader>
-            <DialogTitle>紀野 知成 / Tomonari Kino</DialogTitle>
+            <DialogTitle>{t.modals.wikiTitle}</DialogTitle>
             <DialogDescription id="wiki-modal-description">
-              Wikipedia上の人物情報をご覧いただけます。
+              {t.modals.wikiDescription}
             </DialogDescription>
           </DialogHeader>
           <div className={styles.modalContent}>
-            <p>紀野 知成（きの ともなり、1984年 - ）は、日本の実業家。アットハース株式会社創業者兼CEO。</p>
-            <p>神奈川県出身。上智大学外国語学部フランス語学科卒業、リヨン第三大学に留学経験を持つ。</p>
-            <p>三菱商事にて資源エネルギー部門、フランス駐在を経験後、2013年にアットハース株式会社を創業。
-               外国籍人材向け不動産プラットフォーム「アットハースホーム」を開発・運営。</p>
-            <p>多言語を操り（日本語、英語、フランス語、中国語）、異文化コミュニケーションとIT技術を融合させたビジネスモデルに強みを持つ。</p>
+            {t.modals.wikiContent.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
             <p>
               <a 
                 href="https://ja.wikipedia.org/wiki/%E7%B4%80%E9%87%8E%E7%9F%A5%E6%88%90" 
@@ -458,7 +706,7 @@ const DatingProfile: React.FC = () => {
                 rel="noopener noreferrer"
                 className={styles.companyLink}
               >
-                Wikipediaページを見る
+                {t.modals.wikiLink}
               </a>
             </p>
           </div>
@@ -472,16 +720,15 @@ const DatingProfile: React.FC = () => {
           aria-describedby="gifted-modal-description"
         >
           <DialogHeader>
-            <DialogTitle>ギフテッド</DialogTitle>
+            <DialogTitle>{t.modals.giftedTitle}</DialogTitle>
             <DialogDescription id="gifted-modal-description">
-              ギフテッドに関する詳細な説明をご覧いただけます。
+              {t.modals.giftedDescription}
             </DialogDescription>
           </DialogHeader>
           <div className={styles.modalContent}>
-            <p>ギフテッドとは、高い潜在能力を持った英才児を指します。</p>
-            <p>一般的に知能指数（IQ）が130以上であることが基準とされることが多く、高い認知能力や創造性を持つ特性があります。</p>
-            <p>ギフテッドは単なる高い知能だけでなく、感受性の強さや独特の認知特性を持つこともあります。</p>
-            <p>日本ではまだ認知度が低いですが、海外ではギフテッド教育として特別なプログラムが提供されている国もあります。</p>
+            {t.modals.giftedContent.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
             <p>
               <a 
                 href="https://ja.wikipedia.org/wiki/%E3%82%AE%E3%83%95%E3%83%86%E3%83%83%E3%83%89" 
@@ -489,7 +736,7 @@ const DatingProfile: React.FC = () => {
                 rel="noopener noreferrer"
                 className={styles.companyLink}
               >
-                Wikipediaページで詳細を見る
+                {t.modals.giftedLink}
               </a>
             </p>
           </div>
@@ -497,9 +744,9 @@ const DatingProfile: React.FC = () => {
       </Dialog>
 
       <div className={styles.referralSection} id="contact-section">
-        <h2 className={styles.referralTitle}>友だち紹介フォーム</h2>
-        <ReferralTabs mode={referralMode} onChange={setReferralMode} />
-        <ReferralForm mode={referralMode} />
+        <h2 className={styles.referralTitle}>{t.form.title}</h2>
+        <ReferralTabs mode={referralMode} onChange={setReferralMode} language={language} />
+        <ReferralForm mode={referralMode} language={language} onLanguageToggle={handleLanguageToggle} />
       </div>
     </div>
   );

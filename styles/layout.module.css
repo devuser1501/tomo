@@ -54,12 +54,14 @@
   color: white;
   border: none;
   border-radius: var(--radius-full);
-  padding: var(--spacing-xs) var(--spacing-md);
-  font-size: var(--font-size-sm);
+  padding: 8px 16px;
+  min-width: 120px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-xs);
   transition: background-color var(--transition-fast);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

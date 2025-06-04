@@ -4,21 +4,106 @@ import { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import styles from './ReferralForm.module.css';
 import UploadField from './UploadField';
+import { TRANSLATIONS, Language } from '../../data/translations';
+import { incrementCounter } from '../../utils/incrementCounter';
+import { getCurrentCounters } from '../../utils/supabaseStatusCheck';
 
 // 旅行先
-const TRIP_DESTINATIONS = ['バンコク', 'ハノイ', 'マニラ', 'プラハ', 'イスタンブール', 'ソウル'];
+const TRIP_DESTINATIONS = {
+  ja: ['シドニー', 'プーケット', 'ハワイ', 'サンディエゴ', 'ポルト'],
+  en: ['Sydney', 'Phuket', 'Hawaii', 'San Diego', 'Porto']
+};
+
+// テキスト翻訳（フォーム専用）
+const FORM_TEXTS = {
+  ja: {
+    // フォームラベル
+    nameLabel: 'お名前 *',
+    linkLabel: 'SNS/プロフィールURL または プロフィール画像（任意）',
+    messageLabel: '一言 *',
+    messagePlaceholder: 'なぜTomoとマッチしそうな理由、質問などなんでも！',
+    submitButton: '送信',
+    submittingButton: '送信中...',
+    
+    // 成功メッセージ
+    successTitle: '送信完了！',
+    successMessage: 'メールが正常に送信されました！',
+    newSubmissionButton: '✨ 新しく送信する',
+    
+    // バリデーションエラー
+    nameRequired: '❌ お名前を入力してください',
+    messageRequired: '❌ メッセージを入力してください',
+    
+    // 連絡先情報
+    contactInfo: '📧 メール: kino@athearth.com\n📱 Instagram: @tomonari.kino (DM歓迎)',
+    
+    // 旅行プレゼント説明
+    travelNote: '成婚したら {destinations} いずれかへの往復チケットをプレゼント！✈️\n紹介者・被紹介者の方へささやかなお礼ですが、僕のお気に入りの都市を案内するので一緒に楽しみましょう！😁',
+    
+    // EmailJS用
+    referralMode: {
+      friend: '友達紹介',
+      self: '自己紹介'
+    },
+    emailSubject: '【紹介フォーム】{mode}: {name}',
+    notProvided: '未入力'
+  },
+  en: {
+    // フォームラベル
+    nameLabel: 'Your Name *',
+    linkLabel: 'SNS/Profile URL or Profile Image (Optional)',
+    messageLabel: 'Message *',
+    messagePlaceholder: 'Why do you think you and Tomo would be a good match? Feel free to ask questions!',
+    submitButton: 'Submit',
+    submittingButton: 'Submitting...',
+    
+    // 成功メッセージ
+    successTitle: 'Submission Complete!',
+    successMessage: 'Email has been sent successfully!',
+    newSubmissionButton: '✨ Submit New Form',
+    
+    // バリデーションエラー
+    nameRequired: '❌ Please enter your name',
+    messageRequired: '❌ Please enter a message',
+    
+    // 連絡先情報
+    contactInfo: '📧 Email: kino@athearth.com\n📱 Instagram: @tomonari.kino (DMs welcome)',
+    
+    // 旅行プレゼント説明
+    travelNote: 'If marriage is achieved, round-trip tickets to one of {destinations} will be gifted! ✈️\nA small token of appreciation for both referrer and referee - I\'d love to guide you through my favorite cities and enjoy them together! 😁',
+    
+    // EmailJS用
+    referralMode: {
+      friend: 'Friend Referral',
+      self: 'Self Introduction'
+    },
+    emailSubject: '[Referral Form] {mode}: {name}',
+    notProvided: 'Not provided'
+  }
+};
 
 // EmailJS設定
 const EMAILJS_CONFIG = {
   publicKey: '_dKyERRqdrQNVDnYH'
 };
 
-export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
+interface ReferralFormProps {
+  mode: 'friend' | 'self';
+  language: Language;
+  onLanguageToggle: () => void;
+}
+
+export default function ReferralForm({ mode, language, onLanguageToggle }: ReferralFormProps) {
   const init = { name: '', link: '', msg: '' };
   const [v, set] = useState(init);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  
+  // 現在の言語のテキストを取得
+  const t = FORM_TEXTS[language];
+  const globalT = TRANSLATIONS[language];
+  const destinations = TRIP_DESTINATIONS[language];
   
   // EmailJSの初期化
   useEffect(() => {
@@ -34,20 +119,20 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('🔍 === フォーム送信開始（直接送信） ===');
-    console.log('📝 フォーム送信データ:', { name: v.name, link: v.link, msg: v.msg, mode });
+    console.log('📝 フォーム送信データ:', { name: v.name, link: v.link, msg: v.msg, mode, language });
     
     // クライアントサイドバリデーション
     console.log('🔍 バリデーションチェック開始');
     if (!v.name.trim()) {
       console.log('❌ バリデーションエラー: 名前が空');
-      alert('❌ お名前を入力してください');
+      alert(t.nameRequired);
       return;
     }
     console.log('✅ 名前バリデーション通過:', v.name);
     
     if (!v.msg.trim()) {
       console.log('❌ バリデーションエラー: メッセージが空');
-      alert('❌ メッセージを入力してください');
+      alert(t.messageRequired);
       return;
     }
     console.log('✅ メッセージバリデーション通過:', v.msg);
@@ -69,12 +154,12 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
       const templateParams = {
         from_name: v.name,
         message: v.msg,
-        sender_link: v.link || '未入力',
+        sender_link: v.link || t.notProvided,
         to_email: 'kino@athearth.com',
         // 🔴 GPT分析により判明した不足変数を追加
-        referral_mode: mode === 'friend' ? '友達紹介' : '自己紹介',
-        send_date: new Date().toLocaleString('ja-JP'),
-        subject: `【紹介フォーム】${mode === 'friend' ? '友達紹介' : '自己紹介'}: ${v.name}`
+        referral_mode: t.referralMode[mode],
+        send_date: new Date().toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US'),
+        subject: t.emailSubject.replace('{mode}', t.referralMode[mode]).replace('{name}', v.name)
       };
 
       // 🔍 GPT指摘: 送信内容の完全ログ（空欄チェック用）
@@ -112,10 +197,12 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
         
         // 成功メッセージを表示
         setIsSuccess(true);
-        setSuccessMessage('メールが正常に送信されました！');
+        setSuccessMessage(t.successMessage);
+        
+        // 📨 フォーム送信カウンターを増加
+        incrementCounter('formSubmissions');
         
         console.log('🎊 成功メッセージ表示完了');
-        
       } else {
         // 🔍 GPT診断用: 送信失敗の詳細情報
         console.error('❌ EmailJS送信失敗 - 詳細:', {
@@ -172,7 +259,7 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
         }}>
           <div style={{ fontSize: '48px', marginBottom: '15px' }}>🎉</div>
           <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '12px' }}>
-            送信完了！
+            {t.successTitle}
           </div>
           <div style={{ fontSize: '16px', opacity: 0.95, marginBottom: '8px' }}>
             {successMessage}
@@ -199,13 +286,13 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
               backdropFilter: 'blur(10px)'
             }}
           >
-            ✨ 新しく送信する
+            {t.newSubmissionButton}
           </button>
         </div>
       )}
 
       <form onSubmit={submit} className={styles.form} id="referral-form">
-        <label>お名前 *</label>
+        <label>{t.nameLabel}</label>
         <input 
           required 
           value={v.name} 
@@ -214,7 +301,7 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
             set({ ...v, name: e.target.value });
           }}
         />
-        <label>SNS/プロフィールURL または プロフィール画像（任意）</label>
+        <label>{t.linkLabel}</label>
         <UploadField 
           value={v.link} 
           setValue={(s) => {
@@ -222,7 +309,7 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
             set({ ...v, link: s });
           }}
         />
-        <label>一言 *</label>
+        <label>{t.messageLabel}</label>
         <textarea 
           required 
           rows={4} 
@@ -231,7 +318,7 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
             console.log('📝 メッセージ入力:', e.target.value);
             set({ ...v, msg: e.target.value });
           }}
-          placeholder="なぜTomoとマッチしそうな理由、質問などなんでも！"
+          placeholder={t.messagePlaceholder}
         />
         <button 
           type="submit" 
@@ -239,17 +326,45 @@ export default function ReferralForm({ mode }: { mode: 'friend' | 'self' }) {
           className={isSubmitting ? styles.submitting : ''}
           onClick={() => console.log('🖱️ 送信ボタンクリック:', { name: v.name, msg: v.msg, disabled: isSubmitting })}
         >
-          {isSubmitting ? '送信中...' : '送信'}
+          {isSubmitting ? t.submittingButton : t.submitButton}
         </button>
         <div className={styles.contactMethods}>
           <p className={styles.contactNote}>
-            📧 メール: kino@athearth.com<br/>
-            📱 Instagram: @tomonari.kino (DM歓迎)
+            📧 {language === 'ja' ? 'メール' : 'Email'}: kino@athearth.com<br/>
+            📱 Instagram:{' '}
+            <a 
+              href="https://instagram.com/tomonari.kino" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                color: '#E4405F',
+                textDecoration: 'none',
+                fontWeight: 'bold',
+                transition: 'color 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLAnchorElement).style.color = '#C13584';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLAnchorElement).style.color = '#E4405F';
+              }}
+            >
+              @tomonari.kino
+            </a>{' '}
+            ({language === 'ja' ? 'DM歓迎' : 'DMs welcome'})
           </p>
         </div>
         <p className={styles.note}>
-          成婚したら <strong>{TRIP_DESTINATIONS.join(' / ')}</strong> いずれかへの往復チケットをプレゼント！✈️<br />
-          紹介者・被紹介者の方へささかかなお礼ですが、僕のお気に入りの都市を案内するので一緒に楽しみましょう！😁
+          {t.travelNote
+            .replace('{destinations}', destinations.join(' / '))
+            .split('\n')
+            .map((line, index) => (
+              <span key={index}>
+                {line}
+                {index === 0 && <br />}
+              </span>
+            ))
+          }
         </p>
       </form>
     </>
